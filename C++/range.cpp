@@ -1,3 +1,5 @@
+// Range => [low, high)
+
 #include <iostream>
 using namespace std;
 
@@ -109,5 +111,43 @@ class Range {
 	public bool touching(Range r) {
 		return r.low == this.low || r.high == this.high;
 	}
+	
+	public Range merge(Range r) {
+		if(disjoint(r))
+			return Range();
+		return Range(min(low, r.low), max(high, r.high));
+	}
+	
+	Range common(Range r) {
+		if(disjoint(r))
+			return Range();
+		vector<int> integers{low, high, this.low, this.high};
+		sort(integers.begin(), integers.end());
+		return Range(elements[1], elements[2]);
+	}
+	
+	 enum Relation {
+            SUBSET, SUPERSET, OVERLAPLEFT, OVERLAPRIGHT, TOUCHINGLEFT, TOUCHINGRIGHT, LEFTDISJOINT, RIGHTDISJOINT, SAME
+        };
+        Relation classify(Range r) {
+            if (high == r.low) 
+                return TOUCHINGRIGHT;
+            if (low == r.high)
+                return TOUCHINGLEFT;
+            if (equals(r))
+                return SAME;
+            if (contains(r)) 
+                return SUPERSET;
+            if (r.contains(*this))
+                return SUBSET;
+            if (disjoint(r))
+                if (low > r.high)
+                    return RIGHTDISJOINT;
+                else
+                    return LEFTDISJOINT;
+            if (lessThan(r))
+                return OVERLAPLEFT;
+            return OVERLAPRIGHT;
+        }
 
 }
